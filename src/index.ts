@@ -113,6 +113,7 @@ async function run() {
     await mainPage.bringToFront();
     
     await findCOnlineChannel(mainPage);
+    vinfo('Initial navigation complete')
     setTimeout(runTimer, timeout, mainPage, inventory);
 }
 
