@@ -9,8 +9,6 @@ const cmdUsage = require('command-line-usage');
 const usage = cmdUsage(usageOptions);
 const args = cmdArgs(cmdOptions);
 
-console.log(args);
-
 const { game, timeout, verbose, help } = args
 const headless = !args['no-headless'];
 
