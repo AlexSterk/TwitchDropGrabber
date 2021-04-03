@@ -10,8 +10,9 @@ When the stream it's watching goes offline, it finds a new one. Great for runnin
 0. Ensure you have a working installations of Node.js, npm and Google Chrome
 1. Clone the project
 2. Run `npm install`
-3. Set up the [environment variables](#environment-variables)
-4. Start the project with `npm start -- <GAME>` where the game is your game of choice that currently has active drop campaigns.
+3. Run `npm run build` to compile the typescript files
+4. Set up the [environment variables](#environment-variables)
+5. Start the project with `npm start -- <GAME>` where the game is your game of choice that currently has active drop campaigns.
 Replace `<GAME>` with the ID of the game in the Twitch directory. (e.g. ht<span>tps://</span>twitch.tv/directory/game/**fortnite**)
    
 More options are available, you can see these using `npm start -- --help`

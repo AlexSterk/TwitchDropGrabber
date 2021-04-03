@@ -1,5 +1,5 @@
-dist/
-node_modules/
-.idea/
+/dist
+/node_modules
+/.idea
 *.iml
 .env
