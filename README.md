@@ -2,7 +2,9 @@
 
 Node.js application that watches Twitch streams and collects [Drops](https://help.twitch.tv/s/article/mission-based-drops?language=en_US). 
 When the stream it's watching goes offline, it finds a new one. Great for running in the background: **Set and forget**.
+
 ----
+
 ## How to install/use
 
 0. Ensure you have a working installations of Node.js, npm and Google Chrome
