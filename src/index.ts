@@ -1,3 +1,5 @@
+import {Page} from "puppeteer";
+
 require('dotenv').config();
 import {usageOptions, cmdOptions} from "./cli-config";
 const puppeteer = require("puppeteer");
@@ -26,16 +28,16 @@ if (!process.env.TWITCH_AUTH_TOKEN) {
 
 const directoryUrl = `https://www.twitch.tv/directory/game/${game}?tl=c2542d6d-cd10-4532-919b-3d19f30a768b`;
 
-function info(msg) {
+function info(msg: string) {
     console.info(`[${new Date().toUTCString()}] ${msg}`);
 }
 
-function vinfo(msg) {
+function vinfo(msg: string) {
     if (!verbose) return;
     info(`[VERBOSE] ${msg}`);
 }
 
-async function initTwitch(page) {
+async function initTwitch(page: Page) {
     info('Navigating to Twitch');
     await page.goto('https://twitch.tv', {
         waitUntil: ['networkidle2', 'domcontentloaded']
@@ -56,12 +58,12 @@ async function initTwitch(page) {
     );
 }
 
-async function findCOnlineChannel(page) {
+async function findCOnlineChannel(page: Page) {
     info('Finding online channel...');
     await page.goto(directoryUrl, {
         waitUntil: ['networkidle2', 'domcontentloaded']
     });
-    const aHandle = await page.waitForSelector('a[data-a-target="preview-card-image-link"]', 0);
+    const aHandle = await page.waitForSelector('a[data-a-target="preview-card-image-link"]', {timeout: 0});
     const channel = await page.evaluate(a => a.getAttribute('href'), aHandle);
     info('Channel found: navigating');
     await page.goto(`https://twitch.tv${channel}`, {
@@ -69,7 +71,7 @@ async function findCOnlineChannel(page) {
     });
 }
 
-async function checkInventory(inventory) {
+async function checkInventory(inventory: Page) {
     await inventory.goto('https://twitch.tv/inventory', {
         waitUntil: ['networkidle2', 'domcontentloaded']
     });
@@ -82,7 +84,7 @@ async function checkInventory(inventory) {
     }
 }
 
-async function checkLiveStatus(mainPage) {
+async function checkLiveStatus(mainPage: Page) {
     const status = await mainPage.$$eval('a[status]', li => li.pop()?.getAttribute('status'));
     vinfo(`Channel status: ${status}`);
     if (status !== 'tw-channel-status-indicator--live') {
@@ -91,7 +93,7 @@ async function checkLiveStatus(mainPage) {
     }
 }
 
-async function runTimer(mainPage, inventory) {
+async function runTimer(mainPage: Page, inventory: Page) {
     vinfo('Timer function called')
     await checkInventory(inventory);
     await checkLiveStatus(mainPage);
