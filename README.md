@@ -12,7 +12,7 @@ When the stream it's watching goes offline, it finds a new one. Great for runnin
 2. Run `npm install`
 3. Set up the [environment variables](#environment-variables)
 4. Start the project with `npm start -- <GAME>` where the game is your game of choice that currently has active drop campaigns.
-Replace `<GAME>` with the ID of the game in the Twitch directory. (e.g. https:\//twitch.tv/directory/game/**fortnite**)
+Replace `<GAME>` with the ID of the game in the Twitch directory. (e.g. https:\/\/twitch.tv\/directory\/game\/**fortnite**)
    
 More options are available, you can see these using `npm start -- --help`
    
