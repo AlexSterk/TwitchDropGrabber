@@ -29,7 +29,7 @@ The second variable is `TWITCH_CHROME_EXECUTABLE`, which should point to your Ch
 Make sure this points to the actual application/executable file, and not just the install directory.
 If this path contains spaces, you can wrap it in quote symbols (e.g. "path goes here").
 
-### Disclaimer
+## Disclaimer
 
 I really just made this tiny project for my benefit and don't intend to actively maintain/make changes to it. 
 It works for me and suits my needs. 
