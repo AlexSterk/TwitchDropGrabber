@@ -26,13 +26,21 @@ if (!process.env.TWITCH_AUTH_TOKEN) {
 
 const directoryUrl = `https://www.twitch.tv/directory/game/${game}?tl=c2542d6d-cd10-4532-919b-3d19f30a768b`;
 
+function formatLog(msg: string) {
+    return `[${new Date().toUTCString()}] ${msg}`;
+}
+
 function info(msg: string) {
-    console.info(`[${new Date().toUTCString()}] ${msg}`);
+    console.info(formatLog(msg));
 }
 
 function vinfo(msg: string) {
     if (!verbose) return;
-    info(`[VERBOSE] ${msg}`);
+    console.debug(`[VERBOSE] ${formatLog(msg)}`);
+}
+
+function warn(msg: string) {
+    console.warn(`[WARNING] ${formatLog(msg)}`);
 }
 
 async function initTwitch(page: Page) {
@@ -82,13 +90,27 @@ async function checkInventory(inventory: Page) {
     }
 }
 
+let prevDuration: number = -1;
+
 async function checkLiveStatus(mainPage: Page) {
-    const status = await mainPage.$$eval('a[status]', li => li.pop()?.getAttribute('status'));
-    vinfo(`Channel status: ${status}`);
-    if (status !== 'tw-channel-status-indicator--live') {
+    // const status = await mainPage.$$eval('a[status]', li => li.pop()?.getAttribute('status'));
+    // vinfo(`Channel status: ${status}`);
+    // if (status !== 'tw-channel-status-indicator--live') {
+    //     info('Channel no longer live')
+    //     await findCOnlineChannel(mainPage);
+    // }
+
+    const videoDuration = await mainPage.$eval('video', video => (video as HTMLVideoElement)?.currentTime);
+    vinfo(`Video duration: ${videoDuration}`);
+    if (videoDuration === 0) {
         info('Channel no longer live')
         await findCOnlineChannel(mainPage);
+        return;
     }
+    if (videoDuration === prevDuration) {
+        warn('Stream buffering... There might be a network issue');
+    }
+    prevDuration = videoDuration;
 }
 
 async function runTimer(mainPage: Page, inventory: Page) {
@@ -117,6 +139,6 @@ async function run() {
     setTimeout(runTimer, timeout, mainPage, inventory);
 }
 
-run().then(r => {
+run().then(() => {
     // Nothing
 });

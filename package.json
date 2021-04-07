@@ -1,7 +1,7 @@
 {
   "name": "twitch-drop-grabber",
-  "version": "1.0.0",
-  "description": "Uses puppeteer to watch Twitch streams and claim drops",
+  "version": "2021.04.07.1",
+  "description": "Uses Puppeteer and Google Chrome to watch Twitch streams and claim drops",
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",

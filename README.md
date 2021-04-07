@@ -38,7 +38,7 @@ I have no plans to add new features or improvements, however you are free to ope
 There are some things that would be nice to have though. 
 I might add these myself in the future, but if you feel like it's a fun waste of time, be my guest:
 * A better recovery for slow networks/networks failures
-* A better way of checking if streams are playing. Right now it uses the status icon of the channel, but it might be better to use the actual `video` element instead
+* A better way of checking if streams are playing.
 
 Feel free to suggest more.
 
