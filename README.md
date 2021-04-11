@@ -33,7 +33,9 @@ If this path contains spaces, you can wrap it in quote symbols (e.g. "path goes 
 
 I really just made this tiny project for my benefit and don't intend to actively maintain/make changes to it. 
 It works for me and suits my needs. 
-I have no plans to add new features or improvements, however you are free to open pull requests or issues, and I might look at them in my free time.
+I have no concrete plans to add new features or improvements, however you are free to open pull requests or issues, and I might look at them in my free time.
+
+I might also have some improvements in other branches that I haven't fully tested for myself yet. So you can always try a more 'experimental' branch if something isn't working.
 
 There are some things that would be nice to have though. 
 I might add these myself in the future, but if you feel like it's a fun waste of time, be my guest:
