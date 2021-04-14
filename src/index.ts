@@ -64,7 +64,12 @@ async function initTwitch(page: Page) {
     );
 }
 
+let buffering = 0;
+let prevDuration = -1;
+
 async function findCOnlineChannel(page: Page) {
+    buffering = 0;
+    prevDuration = -1;
     info('Finding online channel...');
     await page.goto(directoryUrl, {
         waitUntil: ['networkidle2', 'domcontentloaded']
@@ -90,25 +95,25 @@ async function checkInventory(inventory: Page) {
     }
 }
 
-let prevDuration: number = -1;
-
 async function checkLiveStatus(mainPage: Page) {
-    // const status = await mainPage.$$eval('a[status]', li => li.pop()?.getAttribute('status'));
-    // vinfo(`Channel status: ${status}`);
-    // if (status !== 'tw-channel-status-indicator--live') {
-    //     info('Channel no longer live')
-    //     await findCOnlineChannel(mainPage);
-    // }
-
-    const videoDuration = await mainPage.$eval('video', video => (video as HTMLVideoElement)?.currentTime);
+    const status = await mainPage.$$eval('a[status]', li => li.pop()?.getAttribute('status'));
+    const videoDuration = await mainPage.$$eval('video', videos => (videos.pop() as HTMLVideoElement)?.currentTime);
+    vinfo(`Channel status: ${status}`);
     vinfo(`Video duration: ${videoDuration}`);
-    if (videoDuration === 0) {
+    if (status !== 'tw-channel-status-indicator--live' || videoDuration === 0) {
         info('Channel no longer live')
         await findCOnlineChannel(mainPage);
         return;
     }
     if (videoDuration === prevDuration) {
-        warn('Stream buffering... There might be a network issue');
+        warn('Stream buffering or offline. If this persists a new channel will be found next cycle');
+        if (++buffering > 1) {
+            info('Channel offline or stream still buffering');
+            await findCOnlineChannel(mainPage);
+            return;
+        }
+    } else {
+        buffering = 0;
     }
     prevDuration = videoDuration;
 }
