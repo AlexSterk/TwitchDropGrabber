@@ -5,11 +5,12 @@ import {usageOptions, cmdOptions} from "./cli-config";
 const puppeteer = require("puppeteer");
 const cmdArgs = require('command-line-args');
 const cmdUsage = require('command-line-usage');
+const fs = require('fs').promises;
 
 const usage = cmdUsage(usageOptions);
 const args = cmdArgs(cmdOptions);
 
-const { game, timeout, verbose, help } = args
+const { game, timeout, verbose, help, proxy, file } = args
 const headless = !args['no-headless'];
 
 if (help || !game) {
@@ -67,10 +68,7 @@ async function initTwitch(page: Page) {
 let buffering = 0;
 let prevDuration = -1;
 
-async function findCOnlineChannel(page: Page) {
-    buffering = 0;
-    prevDuration = -1;
-    info('Finding online channel...');
+async function findRandomChannel(page: Page) {
     await page.goto(directoryUrl, {
         waitUntil: ['networkidle2', 'domcontentloaded']
     });
@@ -80,6 +78,39 @@ async function findCOnlineChannel(page: Page) {
     await page.goto(`https://twitch.tv${channel}`, {
         waitUntil: ['networkidle2', 'domcontentloaded']
     });
+}
+
+let list : string[];
+
+async function readList() {
+    info(`Parsing list of channels: ${file}`);
+    const read = await fs.readFile(file, {encoding: "utf-8"});
+    list = read.split(/\r?\n/);
+    info(`Channels found: ${list.join(', ')}`);
+}
+
+async function findChannelFromList(page: Page) {
+    if (!list) await readList();
+    for (let channel of list) {
+        vinfo(`Trying ${channel}`)
+        await page.goto(`https://twitch.tv/${channel}`, {
+            waitUntil: ['networkidle2', 'domcontentloaded']
+        });
+        const {notLive} = await isLive(page);
+        vinfo(`Channel live: ${!notLive}`);
+        if (notLive) vinfo('Channel offline, trying next channel');
+        else info('Online channel found!');
+        if (!notLive) return;
+    }
+    vinfo('No channels online! Trying again after the timeout');
+}
+
+async function findCOnlineChannel(page: Page) {
+    buffering = 0;
+    prevDuration = -1;
+    info('Finding online channel...');
+    if (file) await findChannelFromList(page);
+    else await findRandomChannel(page);
 }
 
 async function checkInventory(inventory: Page) {
@@ -95,13 +126,19 @@ async function checkInventory(inventory: Page) {
     }
 }
 
-async function checkLiveStatus(mainPage: Page) {
+async function isLive(mainPage: Page) {
     const status = await mainPage.$$eval('a[status]', li => li.pop()?.getAttribute('status'));
     const videoDuration = await mainPage.$$eval('video', videos => (videos.pop() as HTMLVideoElement)?.currentTime);
     vinfo(`Channel status: ${status}`);
     vinfo(`Video duration: ${videoDuration}`);
-    if (status !== 'tw-channel-status-indicator--live' || videoDuration === 0) {
-        info('Channel no longer live')
+    const notLive = status !== 'tw-channel-status-indicator--live' || videoDuration === 0;
+    return {videoDuration, notLive};
+}
+
+async function checkLiveStatus(mainPage: Page) {
+    const {videoDuration, notLive} = await isLive(mainPage);
+    if (notLive) {
+        info('Channel offline');
         await findCOnlineChannel(mainPage);
         return;
     }
@@ -129,7 +166,8 @@ async function run() {
     info('Starting application');
     const browser = await puppeteer.launch({
         executablePath: process.env.TWITCH_CHROME_EXECUTABLE,
-        headless: headless
+        headless: headless,
+        args: proxy ? [`--proxy-server=${proxy}`] : []
     });
     const mainPage = (await browser.pages())[0];
     await mainPage.setViewport({ width: 1280, height: 720 })
@@ -140,7 +178,6 @@ async function run() {
     await mainPage.bringToFront();
     
     await findCOnlineChannel(mainPage);
-    vinfo('Initial navigation complete')
     setTimeout(runTimer, timeout, mainPage, inventory);
 }
 
