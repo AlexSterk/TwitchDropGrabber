@@ -9,7 +9,7 @@ const cmdUsage = require('command-line-usage');
 const usage = cmdUsage(usageOptions);
 const args = cmdArgs(cmdOptions);
 
-const { game, timeout, verbose, help } = args
+const { game, timeout, verbose, help, proxy } = args
 const headless = !args['no-headless'];
 
 if (help || !game) {
@@ -129,7 +129,8 @@ async function run() {
     info('Starting application');
     const browser = await puppeteer.launch({
         executablePath: process.env.TWITCH_CHROME_EXECUTABLE,
-        headless: headless
+        headless: headless,
+        args: proxy ? [`--proxy-server=${proxy}`] : []
     });
     const mainPage = (await browser.pages())[0];
     await mainPage.setViewport({ width: 1280, height: 720 })

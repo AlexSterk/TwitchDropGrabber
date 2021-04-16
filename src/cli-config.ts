@@ -44,6 +44,12 @@ export const usageOptions = [
                 alias: 'h',
                 description: 'Print this guide',
                 type: Boolean
+            },
+            {
+                name: 'proxy',
+                alias: 'p',
+                description: 'Proxy server to use (optional)',
+                typeLabel: '<{underline server/ip}>:<{underline port}>'
             }
         ]
     }
@@ -54,5 +60,6 @@ export const cmdOptions = [
     { name: 'timeout', alias: 't', type: Number, defaultValue: 5000 * 60 },
     { name: 'verbose', alias: 'v', type: Boolean, defaultValue: false },
     { name: 'help', alias: 'h', type: Boolean, defaultValue: false },
-    { name: 'no-headless', type: Boolean, defaultValue: false }
+    { name: 'no-headless', type: Boolean, defaultValue: false },
+    { name: 'proxy', type: String, alias: 'p' }
 ];
