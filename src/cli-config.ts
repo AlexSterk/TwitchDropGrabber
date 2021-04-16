@@ -40,16 +40,22 @@ export const usageOptions = [
                 description: 'Shows the Chrome window when enabled',  
             },
             {
-                name: 'help',
-                alias: 'h',
-                description: 'Print this guide',
-                type: Boolean
-            },
-            {
                 name: 'proxy',
                 alias: 'p',
                 description: 'Proxy server to use (optional)',
                 typeLabel: '<{underline server/ip}>:<{underline port}>'
+            },
+            {
+                name: 'file',
+                alias: 'f',
+                type: String,
+                description: 'Path to a file of Twitch usernames, separated by newlines. When using this, only these channels will be watched (if any of them is online)'
+            },
+            {
+                name: 'help',
+                alias: 'h',
+                description: 'Print this guide',
+                type: Boolean
             }
         ]
     }
@@ -61,5 +67,6 @@ export const cmdOptions = [
     { name: 'verbose', alias: 'v', type: Boolean, defaultValue: false },
     { name: 'help', alias: 'h', type: Boolean, defaultValue: false },
     { name: 'no-headless', type: Boolean, defaultValue: false },
-    { name: 'proxy', type: String, alias: 'p' }
+    { name: 'proxy', type: String, alias: 'p' },
+    { name: 'file', alias: 'f', type: String }
 ];
