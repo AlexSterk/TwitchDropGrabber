@@ -41,7 +41,7 @@ There are some things that would be nice to have though.
 I might add these myself in the future, but if you feel like it's a fun waste of time, be my guest:
 * A better recovery for slow networks/networks failures
 * A better way of checking if streams are playing. 
-* Watch a list of certain streamers instead of searching for a channel
+* ~~Watch a list of certain streamers instead of searching for a channel~~
 
 Feel free to suggest more.
 
