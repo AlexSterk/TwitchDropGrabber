@@ -3,13 +3,17 @@ export const usageOptions = [
         header: 'Twitch Drop Grabber',
         content: [
             'Simulates Chrome to watch Twitch streams and automatically claim drops',
-            'Uses the {underline Drops Enabled} tag to search for channels so make sure the game you choose is currently running drops!'
+            'Uses the {underline Drops Enabled} tag to search for channels so make sure the game you choose is currently running drops!',
+            '',
+            'You can watch a game, a list of specified channels, or specified channels that watch the assigned game'
         ]
     },
     {
         header: 'Synopsis',
         content: [
-            '$ npm start -- [-v] [-t 5000] [--game] valorant',
+            '$ npm start -- [-v] [-t 5000] [--no-headless] [-p "localhost:1234"] [-g] valorant',
+            '$ npm start -- [-v] [-t 5000] [--no-headless] [-p "localhost:1234"] [-g] valorant [-f channels.txt]',
+            '$ npm start -- [-v] [-t 5000] [--no-headless] [-p "localhost:1234"] -f channels.txt',
         ]
     },
     {

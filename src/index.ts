@@ -13,7 +13,7 @@ const args = cmdArgs(cmdOptions);
 const { game, timeout, verbose, help, proxy, file } = args
 const headless = !args['no-headless'];
 
-if (help || !game) {
+if (help || !(game || file)) {
     console.log(usage);
     process.exit(0);
 }
@@ -85,8 +85,8 @@ let list : string[];
 async function readList() {
     info(`Parsing list of channels: ${file}`);
     const read = await fs.readFile(file, {encoding: "utf-8"});
-    list = read.split(/\r?\n/);
-    info(`Channels found: ${list.join(', ')}`);
+    list = read.split(/\r?\n/).filter((s: string) => s.length !== 0);
+    info(`${list.length} channels found: ${list.join(', ')}`);
 }
 
 async function findChannelFromList(page: Page) {
@@ -96,13 +96,22 @@ async function findChannelFromList(page: Page) {
         await page.goto(`https://twitch.tv/${channel}`, {
             waitUntil: ['networkidle2', 'domcontentloaded']
         });
-        const {notLive} = await isLive(page);
-        vinfo(`Channel live: ${!notLive}`);
-        if (notLive) vinfo('Channel offline, trying next channel');
-        else info('Online channel found!');
-        if (!notLive) return;
+        const live = !(await isLive(page)).notLive;
+        vinfo(`Channel live: ${live}`);
+        if (!live) vinfo('Channel offline, trying next channel');
+        else {
+            if (game) {
+                const gameLink = await page.waitForSelector('a[data-a-target="stream-game-link"]');
+                const href = await page.evaluate(a => a.getAttribute('href'), gameLink);
+                const streamingGame = href.toLowerCase().endsWith(`/${game.toLowerCase()}`);
+                vinfo(`Channel streaming the given game: ${streamingGame}`);
+                if (!streamingGame) continue;
+            }
+            info('Online channel found!');
+            return;
+        }
     }
-    vinfo('No channels online! Trying again after the timeout');
+    info('No channels online! Trying again after the timeout');
 }
 
 async function findCOnlineChannel(page: Page) {
