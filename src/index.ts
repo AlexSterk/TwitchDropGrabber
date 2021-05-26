@@ -138,15 +138,17 @@ async function checkInventory(inventory: Page) {
 async function isLive(mainPage: Page) {
     const status = await mainPage.$$eval('a[status]', li => li.pop()?.getAttribute('status'));
     const videoDuration = await mainPage.$$eval('video', videos => (videos.pop() as HTMLVideoElement)?.currentTime);
+    const raid = mainPage.url().includes('?referrer=raid');
+    vinfo(`Current url: ${mainPage.url()}`);
     vinfo(`Channel status: ${status}`);
     vinfo(`Video duration: ${videoDuration}`);
     const notLive = status !== 'tw-channel-status-indicator--live' || videoDuration === 0;
-    return {videoDuration, notLive};
+    return {videoDuration, notLive, raid};
 }
 
 async function checkLiveStatus(mainPage: Page) {
-    const {videoDuration, notLive} = await isLive(mainPage);
-    if (notLive) {
+    const {videoDuration, notLive, raid} = await isLive(mainPage);
+    if (notLive || raid) {
         info('Channel offline');
         await findCOnlineChannel(mainPage);
         return;
