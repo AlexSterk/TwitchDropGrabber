@@ -2,6 +2,7 @@ import {Page} from "puppeteer";
 
 require('dotenv').config();
 import {usageOptions, cmdOptions} from "./cli-config";
+
 const puppeteer = require("puppeteer");
 const cmdArgs = require('command-line-args');
 const cmdUsage = require('command-line-usage');
@@ -10,7 +11,7 @@ const fs = require('fs').promises;
 const usage = cmdUsage(usageOptions);
 const args = cmdArgs(cmdOptions);
 
-const { game, timeout, verbose, help, proxy, file } = args
+const {game, timeout, verbose, help, proxy, file} = args
 const headless = !args['no-headless'];
 
 if (help || !(game || file)) {
@@ -23,7 +24,7 @@ if (!process.env.TWITCH_CHROME_EXECUTABLE) {
 }
 if (!process.env.TWITCH_AUTH_TOKEN) {
     throw new Error('TWITCH_AUTH_TOKEN not set')
-} 
+}
 
 const directoryUrl = `https://www.twitch.tv/directory/game/${game}?tl=c2542d6d-cd10-4532-919b-3d19f30a768b`;
 
@@ -80,7 +81,7 @@ async function findRandomChannel(page: Page) {
     });
 }
 
-let list : string[];
+let list: string[];
 
 async function readList() {
     info(`Parsing list of channels: ${file}`);
@@ -101,7 +102,7 @@ async function findChannelFromList(page: Page) {
         if (!live) vinfo('Channel offline, trying next channel');
         else {
             if (game) {
-                const gameLink = await page.waitForSelector('a[data-a-target="stream-game-link"]');
+                const gameLink = await page.waitForSelector('a[data-a-target="stream-game-link"]', {timeout: 0});
                 const href = await page.evaluate(a => a.getAttribute('href'), gameLink);
                 const streamingGame = href.toLowerCase().endsWith(`/${game.toLowerCase()}`);
                 vinfo(`Channel streaming the given game: ${streamingGame}`);
@@ -126,12 +127,13 @@ async function checkInventory(inventory: Page) {
     await inventory.goto('https://twitch.tv/inventory', {
         waitUntil: ['networkidle2', 'domcontentloaded']
     });
-    const claimButton = (await inventory.$('button[data-test-selector="DropsCampaignInProgressRewardPresentation-claim-button"]'));
-    vinfo(`Claim button found: ${!!claimButton}`);
-    if (claimButton) {
+    const claimButtons = (await inventory.$$('button[data-test-selector="DropsCampaignInProgressRewardPresentation-claim-button"]'));
+    vinfo(`${claimButtons.length} claim buttons found${claimButtons.length > 0 ? '!' : '.'}`);
+    for (const claimButton of claimButtons) {
         info('Reward found! Claiming!')
         await new Promise(resolve => setTimeout(resolve, 1000));
         await claimButton.click();
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
 }
 
@@ -181,13 +183,13 @@ async function run() {
         args: proxy ? [`--proxy-server=${proxy}`] : []
     });
     const mainPage = (await browser.pages())[0];
-    await mainPage.setViewport({ width: 1280, height: 720 })
+    await mainPage.setViewport({width: 1280, height: 720})
     await initTwitch(mainPage);
-    
+
     const inventory = await browser.newPage();
-    await inventory.setViewport({ width: 1280, height: 720 })
+    await inventory.setViewport({width: 1280, height: 720})
     await mainPage.bringToFront();
-    
+
     await findCOnlineChannel(mainPage);
     setTimeout(runTimer, timeout, mainPage, inventory);
 }
