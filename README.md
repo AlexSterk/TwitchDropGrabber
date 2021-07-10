@@ -28,6 +28,7 @@ Do NOT share this with others. This project will only run on your machine, and y
 The second variable is `TWITCH_CHROME_EXECUTABLE`, which should point to your Chrome installation. 
 Make sure this points to the actual application/executable file, and not just the install directory.
 If this path contains spaces, you can wrap it in quote symbols (e.g. "path goes here").
+A good way to find this path is to open Chrome, browse to `chrome://version/` and look under `Executable Path`
 
 ## Disclaimer
 
@@ -42,6 +43,8 @@ I might add these myself in the future, but if you feel like it's a fun waste of
 * A better recovery for slow networks/networks failures
 * A better way of checking if streams are playing.
 * A way to detect channels you are watching going offline and hosting another channel
+* A way to check the channel that is being watched did not switch to a different game
+* An option to configure how many rewards you expect to claim (so the app can terminate once that is reached)
 * ~~Watch a list of certain streamers instead of searching for a channel~~ ✅
 
 Feel free to suggest more.
