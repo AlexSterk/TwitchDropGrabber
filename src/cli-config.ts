@@ -29,7 +29,7 @@ export const usageOptions = [
                 name: 'timeout',
                 alias: 't',
                 typeLabel: '{underline ms}',
-                description: 'How often to refresh the inventory page and check for channel live status. Do not set this to low, to give the browser some time to load the page correctly. Default: 5 minutes'
+                description: 'How often to refresh the inventory page and check for channel live status. Do not set this too low, to give the browser some time to load the page correctly. Default: 5 minutes'
             },
             {
                 name: 'verbose',

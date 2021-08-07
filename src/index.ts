@@ -144,7 +144,7 @@ async function isLive(mainPage: Page) {
     vinfo(`Current url: ${mainPage.url()}`);
     vinfo(`Channel status: ${status}`);
     vinfo(`Video duration: ${videoDuration}`);
-    const notLive = status !== 'tw-channel-status-indicator--live' || videoDuration === 0;
+    const notLive = status !== 'live' || videoDuration === 0;
     return {videoDuration, notLive, raid};
 }
 
