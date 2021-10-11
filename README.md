@@ -25,6 +25,8 @@ I prefer to use a `.env` file, see [.env.example](/.env.example) for an example.
 The first variable you need to set are `TWITCH_AUTH_TOKEN`, which you can find by signing in to Twitch in your browser, and finding the auth-token cookie. 
 Do NOT share this with others. This project will only run on your machine, and your auth token will therefore never leave your machine.
 
+**NOTE: In light of the recent Twitch leaks, do remember to change your password. This also refreshes your auth token so if the tool stops working, you need to replace it with the new token!**
+
 The second variable is `TWITCH_CHROME_EXECUTABLE`, which should point to your Chrome installation. 
 Make sure this points to the actual application/executable file, and not just the install directory.
 If this path contains spaces, you can wrap it in quote symbols (e.g. "path goes here").
@@ -45,6 +47,7 @@ I might add these myself in the future, but if you feel like it's a fun waste of
 * A way to detect channels you are watching going offline and hosting another channel
 * A way to check the channel that is being watched did not switch to a different game
 * An option to configure how many rewards you expect to claim (so the app can terminate once that is reached)
+* A way to detect a faulty auth token and provide feedback
 * ~~Watch a list of certain streamers instead of searching for a channel~~ ✅
 
 Feel free to suggest more.
