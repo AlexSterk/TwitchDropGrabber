@@ -1,8 +1,9 @@
-import { Browser, Page, launch } from "puppeteer";
+import { Browser, Page } from "puppeteer";
 
 require("dotenv").config();
 import { usageOptions, cmdOptions } from "./cli-config";
 
+const puppeteer = require("puppeteer");
 const cmdArgs = require("command-line-args");
 const cmdUsage = require("command-line-usage");
 const fs = require("fs").promises;
@@ -124,12 +125,32 @@ async function findChannelFromList(page: Page): Promise<boolean> {
   return false;
 }
 
+let browser: Browser;
+let mainPage: Page;
+let backupPage: Page;
+
 async function findOnlineChannel(page: Page) {
   buffering = 0;
   prevDuration = -1;
   info("Finding online channel...");
-  if (file) await findChannelFromList(page);
-  else await findRandomChannel(page);
+  if (file && page === mainPage) {
+    const found = await findChannelFromList(page);
+    if (game && !found) {
+      if (!backupPage) {
+        info("Finding backup stream.");
+        backupPage = await browser.newPage();
+        await backupPage.setViewport({ width: 1280, height: 720 });
+        await findRandomChannel(backupPage);
+      } else {
+        vinfo("Checking backup stream");
+        await checkLiveStatus(backupPage);
+      }
+    } else if (found && backupPage) {
+      info("Closing backup stream.");
+      await backupPage.close();
+      await page.bringToFront();
+    }
+  } else await findRandomChannel(page);
 }
 
 async function checkInventory(inventory: Page) {
@@ -199,12 +220,12 @@ async function runTimer(page: Page, inventory: Page) {
 
 async function run() {
   info("Starting application");
-  const browser = await launch({
+  browser = await puppeteer.launch({
     executablePath: process.env.TWITCH_CHROME_EXECUTABLE,
     headless: headless,
     args: proxy ? [`--proxy-server=${proxy}`] : [],
   });
-  const mainPage = (await browser.pages())[0];
+  mainPage = (await browser.pages())[0];
   await mainPage.setViewport({ width: 1280, height: 720 });
   await initTwitch(mainPage);
 

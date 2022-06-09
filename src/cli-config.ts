@@ -11,9 +11,9 @@ export const usageOptions = [
   {
     header: "Synopsis",
     content: [
-      '$ npm start -- [-v] [-t 5000] [--no-headless] [-p "localhost:1234"] [-g] valorant',
-      '$ npm start -- [-v] [-t 5000] [--no-headless] [-p "localhost:1234"] [-g] valorant [-f channels.txt]',
-      '$ npm start -- [-v] [-t 5000] [--no-headless] [-p "localhost:1234"] -f channels.txt',
+      '$ npm start -- [-v] [-t 60000] [--no-headless] [-p "localhost:1234"] [-g] valorant',
+      '$ npm start -- [-v] [-t 60000] [--no-headless] [-p "localhost:1234"] [-g] valorant [-f channels.txt]',
+      '$ npm start -- [-v] [-t 60000] [--no-headless] [-p "localhost:1234"] -f channels.txt',
     ],
   },
   {
@@ -55,7 +55,7 @@ export const usageOptions = [
         alias: "f",
         type: String,
         description:
-          "Path to a file of Twitch usernames, separated by newlines. When using this, only these channels will be watched (if any of them is online)",
+          "Path to a file of Twitch usernames, separated by newlines. When using this, only these channels will be watched (if any of them is online). If no channel is online, and -g is set, a random channel is watched in the background.",
       },
       {
         name: "help",
