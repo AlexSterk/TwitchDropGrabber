@@ -152,27 +152,27 @@ async function checkInventory(inventory: Page) {
   }
 }
 
-async function isLive(mainPage: Page) {
-  const status = await mainPage.$$eval("a[status]", (li) =>
+async function isLive(channelPage: Page) {
+  const status = await channelPage.$$eval("a[status]", (li) =>
     li.pop()?.getAttribute("status")
   );
-  const videoDuration = await mainPage.$$eval(
+  const videoDuration = await channelPage.$$eval(
     "video",
     (videos) => (videos.pop() as HTMLVideoElement)?.currentTime
   );
-  const raid = mainPage.url().includes("?referrer=raid");
-  vinfo(`Current url: ${mainPage.url()}`);
+  const raid = channelPage.url().includes("?referrer=raid");
+  vinfo(`Current url: ${channelPage.url()}`);
   vinfo(`Channel status: ${status}`);
   vinfo(`Video duration: ${videoDuration}`);
   const notLive = status !== "live" || videoDuration === 0;
   return { videoDuration, notLive, raid };
 }
 
-async function checkLiveStatus(mainPage: Page) {
-  const { videoDuration, notLive, raid } = await isLive(mainPage);
+async function checkLiveStatus(channelPage: Page) {
+  const { videoDuration, notLive, raid } = await isLive(channelPage);
   if (notLive || raid) {
     info("Channel offline");
-    await findOnlineChannel(mainPage);
+    await findOnlineChannel(channelPage);
     return;
   }
   if (videoDuration === prevDuration) {
@@ -181,7 +181,7 @@ async function checkLiveStatus(mainPage: Page) {
     );
     if (++buffering > 1) {
       info("Channel offline or stream still buffering");
-      await findOnlineChannel(mainPage);
+      await findOnlineChannel(channelPage);
       return;
     }
   } else {
@@ -190,11 +190,11 @@ async function checkLiveStatus(mainPage: Page) {
   prevDuration = videoDuration;
 }
 
-async function runTimer(mainPage: Page, inventory: Page) {
+async function runTimer(page: Page, inventory: Page) {
   vinfo("Timer function called");
   await checkInventory(inventory);
-  await checkLiveStatus(mainPage);
-  setTimeout(runTimer, timeout, mainPage, inventory);
+  await checkLiveStatus(page);
+  setTimeout(runTimer, timeout, page, inventory);
 }
 
 async function run() {
