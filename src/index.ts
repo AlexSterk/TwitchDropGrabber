@@ -1,9 +1,8 @@
-import { Page } from "puppeteer";
+import { Browser, Page, launch } from "puppeteer";
 
 require("dotenv").config();
 import { usageOptions, cmdOptions } from "./cli-config";
 
-const puppeteer = require("puppeteer");
 const cmdArgs = require("command-line-args");
 const cmdUsage = require("command-line-usage");
 const fs = require("fs").promises;
@@ -91,7 +90,7 @@ async function readList() {
   info(`${list.length} channels found: ${list.join(", ")}`);
 }
 
-async function findChannelFromList(page: Page) {
+async function findChannelFromList(page: Page): Promise<boolean> {
   if (!list) await readList();
   for (let channel of list) {
     vinfo(`Trying ${channel}`);
@@ -118,10 +117,11 @@ async function findChannelFromList(page: Page) {
         if (!streamingGame) continue;
       }
       info("Online channel found!");
-      return;
+      return true;
     }
   }
   info("No channels online! Trying again after the timeout");
+  return false;
 }
 
 async function findOnlineChannel(page: Page) {
@@ -199,7 +199,7 @@ async function runTimer(page: Page, inventory: Page) {
 
 async function run() {
   info("Starting application");
-  const browser = await puppeteer.launch({
+  const browser = await launch({
     executablePath: process.env.TWITCH_CHROME_EXECUTABLE,
     headless: headless,
     args: proxy ? [`--proxy-server=${proxy}`] : [],
