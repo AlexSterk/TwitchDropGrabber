@@ -91,6 +91,16 @@ async function readList() {
   info(`${list.length} channels found: ${list.join(", ")}`);
 }
 
+async function streamingGame(page: Page) {
+  const gameLink = await page.waitForSelector(
+    'a[data-a-target="stream-game-link"]',
+    { timeout: 0 }
+  );
+  const href = await page.evaluate((a) => a.getAttribute("href"), gameLink);
+  const streamingGame = href.toLowerCase().endsWith(`/${game.toLowerCase()}`);
+  return streamingGame;
+}
+
 async function findChannelFromList(page: Page): Promise<boolean> {
   if (!list) await readList();
   for (let channel of list) {
@@ -103,19 +113,9 @@ async function findChannelFromList(page: Page): Promise<boolean> {
     if (!live) vinfo("Channel offline, trying next channel");
     else {
       if (game) {
-        const gameLink = await page.waitForSelector(
-          'a[data-a-target="stream-game-link"]',
-          { timeout: 0 }
-        );
-        const href = await page.evaluate(
-          (a) => a.getAttribute("href"),
-          gameLink
-        );
-        const streamingGame = href
-          .toLowerCase()
-          .endsWith(`/${game.toLowerCase()}`);
-        vinfo(`Channel streaming the given game: ${streamingGame}`);
-        if (!streamingGame) continue;
+        const _streamingGame = await streamingGame(page);
+        vinfo(`Channel streaming the given game: ${_streamingGame}`);
+        if (!_streamingGame) continue;
       }
       info("Online channel found!");
       return true;
@@ -174,6 +174,7 @@ async function checkInventory(inventory: Page) {
 }
 
 async function isLive(channelPage: Page) {
+  await channelPage.bringToFront();
   const status = await channelPage.$$eval("a[status]", (li) =>
     li.pop()?.getAttribute("status")
   );
@@ -182,17 +183,25 @@ async function isLive(channelPage: Page) {
     (videos) => (videos.pop() as HTMLVideoElement)?.currentTime
   );
   const raid = channelPage.url().includes("?referrer=raid");
+  const _streamingGame = game ? await streamingGame(channelPage) : true;
   vinfo(`Current url: ${channelPage.url()}`);
   vinfo(`Channel status: ${status}`);
   vinfo(`Video duration: ${videoDuration}`);
+  vinfo(`Streaming game: ${_streamingGame}`);
   const notLive = status !== "live" || videoDuration === 0;
-  return { videoDuration, notLive, raid };
+  return { videoDuration, notLive, raid, streamingGame: _streamingGame };
 }
 
 async function checkLiveStatus(channelPage: Page) {
-  const { videoDuration, notLive, raid } = await isLive(channelPage);
+  const { videoDuration, notLive, raid, streamingGame } = await isLive(
+    channelPage
+  );
   if (notLive || raid) {
     info("Channel offline");
+    await findOnlineChannel(channelPage);
+    return;
+  } else if (!streamingGame) {
+    info("Channel not streaming game");
     await findOnlineChannel(channelPage);
     return;
   }
