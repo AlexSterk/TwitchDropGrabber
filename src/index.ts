@@ -75,7 +75,7 @@ async function findRandomChannel(page: Page) {
     });
     const aHandle = await page.waitForSelector('a[data-a-target="preview-card-image-link"]', {timeout: 0});
     const channel = await page.evaluate(a => a.getAttribute('href'), aHandle);
-    info('Channel found: navigating');
+    info(`Channel found: navigating to ${channel}`);
     await page.goto(`https://twitch.tv${channel}`, {
         waitUntil: ['networkidle2', 'domcontentloaded']
     });
