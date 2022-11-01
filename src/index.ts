@@ -153,8 +153,10 @@ async function findOnlineChannel(page: Page) {
   } else await findRandomChannel(page);
 }
 
+const INVENTORY_URL = "https://www.twitch.tv/drops/inventory";
+
 async function checkInventory(inventory: Page) {
-  await inventory.goto("https://twitch.tv/inventory", {
+  await inventory.goto(INVENTORY_URL, {
     waitUntil: ["networkidle2", "domcontentloaded"],
   });
   const claimButtons = await inventory.$$(
@@ -165,12 +167,18 @@ async function checkInventory(inventory: Page) {
       claimButtons.length > 0 ? "!" : "."
     }`
   );
-  for (const claimButton of claimButtons) {
-    info("Reward found! Claiming!");
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    await claimButton.click();
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  if (claimButtons.length > 0) {
+    info(
+      `${claimButtons.length} drops found! Please head to ${INVENTORY_URL} to claim them!`
+    );
   }
+  // for (const claimButton of claimButtons) {
+  //   info("Reward found! Claiming!");
+  //   await new Promise((resolve) => setTimeout(resolve, 1000));
+  //   await claimButton.click();
+  //   await new Promise((resolve) => setTimeout(resolve, 1000));
+  // }
 }
 
 async function isLive(channelPage: Page) {

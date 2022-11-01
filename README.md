@@ -1,7 +1,15 @@
 # Twitch Drop Grabber
 
-Node.js application that watches Twitch streams and collects [Drops](https://help.twitch.tv/s/article/mission-based-drops?language=en_US). 
+Node.js application that watches Twitch streams ~~and collects [Drops](https://help.twitch.tv/s/article/mission-based-drops?language=en_US)~~. 
 When the stream it's watching goes offline, it finds a new one. Great for running in the background: **Set and forget**.
+
+## READ THIS -- VERY IMPORTANT
+Twitch has started to crack down on bots to farm drops. Therefore, as of right now, I've had to disable the claiming feature. 
+
+Instead, when a drop is found, it will be logged to the console with a link, so you can manually claim it.
+
+I'm not sure if this will be permanent or not. I will try to implement a fix as soon as one has been found. 
+If you have any ideas, feel free to open a pull request.
 
 ----
 
