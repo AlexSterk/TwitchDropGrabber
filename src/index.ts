@@ -68,15 +68,18 @@ let buffering = 0;
 let prevDuration = -1;
 
 async function findRandomChannel(page: Page) {
-    await page.goto(directoryUrl, {
-        waitUntil: ['networkidle2', 'domcontentloaded']
-    });
-    const aHandle = await page.waitForSelector('a[data-a-target="preview-card-image-link"]', {timeout: 0});
-    const channel = await page.evaluate(a => a.getAttribute('href'), aHandle);
-    info(`Channel found: navigating to ${channel}`);
-    await page.goto(`https://twitch.tv${channel}`, {
-        waitUntil: ['networkidle2', 'domcontentloaded']
-    });
+  await page.goto(directoryUrl, {
+    waitUntil: ["networkidle2", "domcontentloaded"],
+  });
+  const aHandle = await page.waitForSelector(
+    'a[data-a-target="preview-card-image-link"]',
+    { timeout: 0 }
+  );
+  const channel = await page.evaluate((a) => a.getAttribute("href"), aHandle);
+  info(`Channel found: navigating to ${channel}`);
+  await page.goto(`https://twitch.tv${channel}`, {
+    waitUntil: ["networkidle2", "domcontentloaded"],
+  });
 }
 
 let list: string[];
